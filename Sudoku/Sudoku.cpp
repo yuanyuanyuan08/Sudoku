@@ -20,18 +20,20 @@ int main(int argc, char *argv[])
 			return 0;
 		}
 		//SudokuCreate(Num, FilePath);//生成终局到指定文件
-		Sudo.SudokuCreate(Num,InputFilePath);
+		Sudo.SudokuCreate(Num);
 	}
 	else if (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "-S") == 0)//参数"-s"或"-S"表示要求解终局
 	{
+		Sudoku Sudo;
 		char* OutFile = argv[2];
-		ifstream file(InputFilePath);
-		if (!file)
+		ifstream File(InputFilePath);
+		if (!File)
 		{
 			printf("Please generate sudoku first!\n");
 			return 0;
 		}
 		//SudokuAnswer(FilePath,OutFile);
+		Sudo.SudokuPuzzleGenerate();
 	}
 
     

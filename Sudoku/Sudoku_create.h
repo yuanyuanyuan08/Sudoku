@@ -2,24 +2,28 @@
 #ifndef SUDOKU_CREATE_H
 #define SUDOKU_CREATE_H
 #include <string.h>
+#include <string>
 #include <iostream>
 #include <fstream>
 #include <vector>
 #include <map>
 #include <algorithm>
-#define InputFilePath "output.txt"
+#define InputFilePath "./BIN/output.txt"
+#define PuzzleFilePath "./BIN/puzzle.txt"
 using namespace std;
 class Sudoku
 {
 public:
 	bool lex_next_perm(int Array[], int n);//寻找下一字典序排列
-	int SudokuCreate(int num, char* FilePath);
-
+	int SudokuCreate(int num);
+	int SudokuPuzzleGenerate();
+	int SolvePuzzle(char* AnswerFilePath);
 
 private:
+	void RandomSpace(int (*Array)[9],ofstream &PuzzleFile);
 	void interchange(int Array[], int i, int j);
 	void reverse(int Array[], int i, int j);
-	bool output(int row23, int row46, int row79,char *FilePath);
+	bool output(int row23, int row46, int row79,ofstream &FilePath);
 	int SudoArray[9] = {1,2,3,4,5,6,7,8,9};
 	int SudoMap[9][9];
 	int RowOrder13[2][3] = { {0,1,2}, {0,2,1} };
@@ -29,12 +33,19 @@ private:
 	
 
 
-int Sudoku::SudokuCreate(int num, char *FilePath)
+int Sudoku::SudokuCreate(int num)
 {
 	
 	int MoveLeft[8] = { 3,6,1,4,7,2,5,8 };
 	int number = 0;
 	bool flag = true;
+	ofstream InputFile;
+	InputFile.open(InputFilePath, ios::out);//文件不存在则创建，若文件已存在则清空原内容
+	if (!InputFile)
+	{
+		printf("Open file failed!\n");
+		return false;
+	}
 	while(flag)
 	{
 		memcpy(SudoMap[0], SudoArray, sizeof(SudoArray));
@@ -45,7 +56,7 @@ int Sudoku::SudokuCreate(int num, char *FilePath)
 			for (int row46 = 0; row46 < 6; row46++)
 				for (int row79 = 0; row79 < 6; row79++)
 				{
-					bool  FlagOutput= output(row23, row46, row79, FilePath);
+					bool  FlagOutput= output(row23, row46, row79, InputFile);
 					if (FlagOutput)
 					{
 						number++;
@@ -57,25 +68,21 @@ int Sudoku::SudokuCreate(int num, char *FilePath)
 				}
 		flag = lex_next_perm(SudoArray + 1, 8);
 	}
+	InputFile.close();
 	return 0;
 }
-bool Sudoku::output(int row23, int row46, int row79, char* FilePath)
+bool Sudoku::output(int row23, int row46, int row79, ofstream &File)
 {
 	int RowOrder[9];
-	memcpy(RowOrder, RowOrder13[row23], sizeof(RowOrder13[0]));
+	memcpy(RowOrder, RowOrder13[row23], sizeof(RowOrder13[row23]));
 	memcpy(RowOrder + 3, RowOrder46[row46], sizeof(RowOrder46[row46]));
 	memcpy(RowOrder + 6, RowOrder79[row79], sizeof(RowOrder79[row79]));
-	ofstream InputFile(InputFilePath, ios::out);//文件不存在则创建，若文件已存在则清空原内容
-	if (!InputFile)
-	{
-		printf("Open file failed!\n");
-		return false;
-	}
+
 	for (int i = 0; i < 9; i++)
 	{
 		for (int j = 0; j < 9; j++)
-			InputFile << SudoMap[RowOrder[i]][j] << " ";
-		InputFile << endl;
+			File << SudoMap[RowOrder[i]][j] << " ";
+		File << endl;
 	}
 	
 	return true;
@@ -126,6 +133,73 @@ bool Sudoku::lex_next_perm(int Array[], int n)
 	}
 	return false;
 }
+
+int Sudoku::SudokuPuzzleGenerate()
+{
+	ifstream SudokuFile(InputFilePath);
+	ofstream SudokuPuzzle(PuzzleFilePath);
+	string str;
+	int line[3][9];
+	int count = 0;
+	if (SudokuFile.fail()||SudokuPuzzle.fail())
+	{
+		printf("Open File Error!\n");
+		return -1;
+	}
+	while (getline(SudokuFile,str))
+	{
+		for (int i = 0,j = 0; i < 18; i++)
+		{
+			if (str[i] == ' ' || str[i] == '\n' ||str[i] == '0')
+				continue;
+			line[count][j] = str[i] - '0';
+			j++;
+
+		}
+		count++;
+		if (count == 3)
+		{
+			RandomSpace(line, SudokuPuzzle);
+			count = 0;
+		}
+	}
+	SudokuFile.close();
+	SudokuPuzzle.close();
+	return 0;
+}
+void Sudoku::RandomSpace(int(*Array)[9], ofstream& PuzzleFile)
+{
+	int SpaceNum = 0, BoxNumber = 0;
+	int row, column;
+	for (BoxNumber = 0; BoxNumber < 3; BoxNumber++)//三行矩阵包括三个宫，每个宫中都安排4个空格，总共36个空格
+	{
+		for (SpaceNum = 0; SpaceNum < 4;)
+		{
+			int pos = rand() % 8;//生成0~8之间的随机数
+			row = pos / 3;
+			column = pos % 3 + BoxNumber * 3;
+			if (!Array[row][column])//若该位置已经是0，则说明生成了重复的位置，需要重新生成
+				continue;
+			Array[row][column] = 0;
+			SpaceNum++;
+		}
+
+	}
+	for (int i = 0; i < 3; i++)
+	{
+		for (int j = 0; j < 9; j++)
+		{
+			PuzzleFile << Array[i][j] << " ";
+		}
+		PuzzleFile << endl;
+	}
+}
+
+int Sudoku::SolvePuzzle(char* AnswerFilePath)
+{
+	return 0;
+}
+
 
 
 #endif
