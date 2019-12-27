@@ -1,11 +1,43 @@
 ﻿// Sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
-
+#include <string.h>
 #include <iostream>
+#include <fstream>
+#include "Sudoku_create.h"
+#include "Sudoku_answer.h"
+#define filePath "/bin/output.txt"
 
-int main()
+using namespace std;
+
+int main(int argc, char *argv[])
 {
-    std::cout << "Hello World!\n";
+	if (argc != 3)
+	{
+		printf("Input Error!\n");
+		return 0;
+	}
+	if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-C") == 0)
+	{
+		int num;
+		if ((num = atoi(argv[2])) == 0)
+		{
+			printf("Input Error!\n");
+			return 0;
+		}
+		Sudoku_create(num,"./bin/outputText.txt");
+	}
+	else if (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "-S") == 0)
+	{
+		ifstream file(filePath);
+		if (!file)
+		{
+			printf("Please generate sudoku first!\n");
+			return 0;
+		}
+		Sudoku_answer(filePath);
+	}
+
+    
 }
 
 // 运行程序: Ctrl + F5 或调试 >“开始执行(不调试)”菜单
