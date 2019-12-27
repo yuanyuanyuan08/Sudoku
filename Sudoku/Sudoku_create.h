@@ -1,2 +1,7 @@
 #pragma once
-int Sudoku_create(int num,char *filePath);
+#ifndef SUDOKU_CREATE_H
+#define SUDOKU_CREATE_H
+int SudokuCreate(int num,char *filePath);
+
+
+#endif

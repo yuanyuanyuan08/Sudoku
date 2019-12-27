@@ -5,36 +5,37 @@
 #include <fstream>
 #include "Sudoku_create.h"
 #include "Sudoku_answer.h"
-#define filePath "/bin/output.txt"
+#define FilePath "/bin/output.txt"
 
 using namespace std;
 
 int main(int argc, char *argv[])
 {
-	if (argc != 3)
+	if (argc != 3)//生成数独终局和求解数独终局的命令行参数都是3个，若输入不为3个则为不合法输入
 	{
 		printf("Input Error!\n");
 		return 0;
 	}
-	if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-C") == 0)
+	if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-C") == 0)//参数"-c"或"-C"表示要生成终局
 	{
-		int num;
-		if ((num = atoi(argv[2])) == 0)
+		double num;
+		if ((num = atoi(argv[2])) == 0|| num != (int)num)//若输入的不是数独终局数量则输入不合法
 		{
 			printf("Input Error!\n");
 			return 0;
 		}
-		Sudoku_create(num,"./bin/outputText.txt");
+		SudokuCreate(num, FilePath);//生成终局到指定文件
 	}
-	else if (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "-S") == 0)
+	else if (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "-S") == 0)//参数"-s"或"-S"表示要求解终局
 	{
-		ifstream file(filePath);
+		char* OutFile = argv[2];
+		ifstream file(FilePath);
 		if (!file)
 		{
 			printf("Please generate sudoku first!\n");
 			return 0;
 		}
-		Sudoku_answer(filePath);
+		SudokuAnswer(FilePath,OutFile);
 	}
 
     

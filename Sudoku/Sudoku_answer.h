@@ -1,2 +1,6 @@
 #pragma once
-int Sudoku_answer(char* filePath);
+#ifndef SUDOKU_ANSWER
+#define SUDOKU_ANSWER
+int SudokuAnswer(char* InputFilePath,char* OutputFilePath);
+
+#endif
