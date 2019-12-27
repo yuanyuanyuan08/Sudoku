@@ -26,14 +26,10 @@ int main(int argc, char *argv[])
 	{
 		Sudoku Sudo;
 		char* OutFile = argv[2];
-		ifstream File(InputFilePath);
-		if (!File)
-		{
-			printf("Please generate sudoku first!\n");
-			return 0;
-		}
+		
 		//SudokuAnswer(FilePath,OutFile);
 		Sudo.SudokuPuzzleGenerate();
+		Sudo.SolvePuzzle(OutFile);
 	}
 
     

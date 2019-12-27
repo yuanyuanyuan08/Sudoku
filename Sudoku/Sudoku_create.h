@@ -3,6 +3,7 @@
 #define SUDOKU_CREATE_H
 #include <string.h>
 #include <string>
+#include <sstream>
 #include <iostream>
 #include <fstream>
 #include <vector>
@@ -20,9 +21,11 @@ public:
 	int SolvePuzzle(char* AnswerFilePath);
 
 private:
+	void BackTrack(int pos,ofstream &AnswerFile);
 	void RandomSpace(int (*Array)[9],ofstream &PuzzleFile);
 	void interchange(int Array[], int i, int j);
 	void reverse(int Array[], int i, int j);
+	bool IsPlace(int pos);
 	bool output(int row23, int row46, int row79,ofstream &FilePath);
 	int SudoArray[9] = {1,2,3,4,5,6,7,8,9};
 	int SudoMap[9][9];
@@ -197,9 +200,93 @@ void Sudoku::RandomSpace(int(*Array)[9], ofstream& PuzzleFile)
 
 int Sudoku::SolvePuzzle(char* AnswerFilePath)
 {
+	string str;
+	stringstream buf;
+	int count = 0,row = 0;
+	ofstream AnswerFile(AnswerFilePath);
+	ifstream PuzzleFile(PuzzleFilePath);
+	if (PuzzleFile.fail()||AnswerFile.fail())
+	{
+		printf("Please generate sudoku first!\n");
+		return 0;
+	}
+	buf << PuzzleFile.rdbuf();
+	str = buf.str();
+	
+	for (string::iterator iter = str.begin(); iter != str.end(); iter++)
+	{
+		if (*iter == ' ' || *iter == '\n')
+			continue;
+		SudoMap[row][count] = *iter - '0';
+		count++;
+		if (count == 9)
+		{
+			row++;
+			count = 0;
+			if (row == 9)
+			{
+				BackTrack(0,AnswerFile);
+				
+				row = 0;
+			}
+		}
+	}
+	PuzzleFile.close();
+	AnswerFile.close();
 	return 0;
 }
+void Sudoku::BackTrack(int pos, ofstream& AnswerFile)
+{
+	if (pos == 81)
+	{
+		output(0, 0, 0, AnswerFile);
+		return;
+	}
+	int row = pos / 9;
+	int column = pos % 9;
+	if (SudoMap[row][column] == 0)
+	{
+		for (int i = 1; i <= 9; i++)
+		{
+			SudoMap[row][column] = i;
+			if (IsPlace(pos))
+				BackTrack(pos + 1, AnswerFile);
+		}
+		
+	}
+	else
+		BackTrack(pos + 1,AnswerFile);
 
-
-
+}
+bool Sudoku::IsPlace(int pos)
+{
+	int row = pos / 9;
+	int column = pos % 9;
+	for (int i = 0; i < 9; i++)
+	{
+		if (i == column)
+			continue;
+		if (SudoMap[row][i] == SudoMap[row][column] )
+			return false;
+	}
+	for (int i = 0; i < 9; i++)
+	{
+		if (i == row)
+			continue;
+		if (SudoMap[i][column] == SudoMap[row][column])
+			return false;
+	}
+	int BoxRow = row / 3 * 3;
+	int BoxColumn = column / 3 * 3;
+	for (int i = BoxRow; i < BoxRow + 3; i++)
+	{
+		for (int j = BoxColumn; j < BoxColumn + 3; j++)
+		{
+			if (i == row && j == column) continue;
+			if (SudoMap[i][j] == SudoMap[row][column])
+				return false;
+		}
+	}
+	return true;
+}
 #endif
