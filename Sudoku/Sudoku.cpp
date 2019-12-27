@@ -1,13 +1,7 @@
 ﻿// Sudoku.cpp : 此文件包含 "main" 函数。程序执行将在此处开始并结束。
 //
-#include <string.h>
-#include <iostream>
-#include <fstream>
-#include "Sudoku_create.h"
-#include "Sudoku_answer.h"
-#define FilePath "/bin/output.txt"
 
-using namespace std;
+#include "Sudoku_create.h"
 
 int main(int argc, char *argv[])
 {
@@ -18,24 +12,26 @@ int main(int argc, char *argv[])
 	}
 	if (strcmp(argv[1], "-c") == 0 || strcmp(argv[1], "-C") == 0)//参数"-c"或"-C"表示要生成终局
 	{
-		double num;
-		if ((num = atoi(argv[2])) == 0|| num != (int)num)//若输入的不是数独终局数量则输入不合法
+		Sudoku Sudo;
+		double Num;
+		if ((Num = atoi(argv[2])) == 0|| Num != (int)Num)//若输入的不是数独终局数量则输入不合法
 		{
 			printf("Input Error!\n");
 			return 0;
 		}
-		SudokuCreate(num, FilePath);//生成终局到指定文件
+		//SudokuCreate(Num, FilePath);//生成终局到指定文件
+		Sudo.SudokuCreate(Num,InputFilePath);
 	}
 	else if (strcmp(argv[1], "-s") == 0 || strcmp(argv[1], "-S") == 0)//参数"-s"或"-S"表示要求解终局
 	{
 		char* OutFile = argv[2];
-		ifstream file(FilePath);
+		ifstream file(InputFilePath);
 		if (!file)
 		{
 			printf("Please generate sudoku first!\n");
 			return 0;
 		}
-		SudokuAnswer(FilePath,OutFile);
+		//SudokuAnswer(FilePath,OutFile);
 	}
 
     
